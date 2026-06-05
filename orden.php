@@ -562,16 +562,22 @@ if (!$modoSoloMesa && $ordenActual) {
             <i class="fa-solid fa-check"></i>
         </button>
         <?php else: ?>
+<<<<<<< HEAD
         <div class="grid grid-cols-2 gap-2 mb-3">
         <button id="btnImprimirDetalle" class="w-full py-2 md:py-3 rounded-full border border-[#A83232] text-[#A83232] font-head font-extrabold text-lg shadow-lg hover:bg-[#A83232]/10 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
             <i class="fa-solid fa-print"></i>    
             <span>IMPRIMIR DETALLE</span>
         </button>
+=======
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
         <button id="btnPagarPedido" class="w-full py-2 md:py-3 rounded-full bg-[#A83232] text-white font-head font-extrabold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3">
             <span>CONFIRMAR PAGO</span>
             <i class="fa-solid fa-check"></i>
         </button>
+<<<<<<< HEAD
         </div>
+=======
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
         <?php endif; ?>
 
         <?php elseif ($puedeReabrir): ?>
@@ -756,6 +762,7 @@ if (!$modoSoloMesa && $ordenActual) {
         );
     });
 
+<<<<<<< HEAD
     on("btnImprimirDetalle", "click", async () => {
         if (ORDEN_ACTUAL === null) return;
 
@@ -769,6 +776,8 @@ if (!$modoSoloMesa && $ordenActual) {
         );
     });
 
+=======
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
     on("btnPagarPedido", "click", async () => {
         if (ORDEN_ACTUAL === null) return;
 

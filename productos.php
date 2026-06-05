@@ -11,13 +11,18 @@ if (!isset($_SESSION["usuario"])) {
 
 require_once("conexion.php");
 
+<<<<<<< HEAD
 function responderJson(array $data): void
 {
+=======
+function responderJson(array $data): void {
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
     header("Content-Type: application/json; charset=utf-8");
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
+<<<<<<< HEAD
 function baseImagenProducto(string $nombre): string
 {
     return str_replace(' ', '_', trim($nombre));
@@ -30,6 +35,17 @@ function rutaImagenProducto(string $nombre): string
 
 function validarYGuardarWebp(array $file, string $destinoAbsoluto): array
 {
+=======
+function baseImagenProducto(string $nombre): string {
+    return str_replace(' ', '_', trim($nombre));
+}
+
+function rutaImagenProducto(string $nombre): string {
+    return "img/" . baseImagenProducto($nombre) . ".webp";
+}
+
+function validarYGuardarWebp(array $file, string $destinoAbsoluto): array {
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
     if (!isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
         return [false, null, null];
     }
@@ -65,6 +81,7 @@ function validarYGuardarWebp(array $file, string $destinoAbsoluto): array
     return [true, $destinoAbsoluto, basename($destinoAbsoluto)];
 }
 
+<<<<<<< HEAD
 function normalizarCategoria(string $categoria): string
 {
     $categoria = strtolower(trim($categoria));
@@ -73,6 +90,14 @@ function normalizarCategoria(string $categoria): string
 
 function obtenerTamanosPost(): array
 {
+=======
+function normalizarCategoria(string $categoria): string {
+    $categoria = strtolower(trim($categoria));
+    return in_array($categoria, ['pizza', 'extra', 'bebida'], true) ? $categoria : 'extra';
+}
+
+function obtenerTamanosPost(): array {
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
     $ids = $_POST['tamano_id'] ?? [];
     $nombres = $_POST['tamano_nombre'] ?? [];
     $precios = $_POST['tamano_precio'] ?? [];
@@ -117,8 +142,12 @@ function obtenerTamanosPost(): array
     return $tamanos;
 }
 
+<<<<<<< HEAD
 function cargarProductoCompleto(mysqli $conexion, int $productoId): ?array
 {
+=======
+function cargarProductoCompleto(mysqli $conexion, int $productoId): ?array {
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
     $stmt = $conexion->prepare("\n        SELECT id, nombre, descripcion, categoria, estado\n        FROM producto\n        WHERE id = ?\n        LIMIT 1\n    ");
     $stmt->bind_param('i', $productoId);
     $stmt->execute();
@@ -436,7 +465,10 @@ $totalProductos = count($productos);
 ?>
 <!DOCTYPE html>
 <html lang="es">
+<<<<<<< HEAD
 
+=======
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -446,7 +478,10 @@ $totalProductos = count($productos);
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
 <body class="h-dvh w-screen overflow-hidden flex text-sm lg:text-base bg-white">
     <div class="h-full w-full flex">
         <aside class="w-24 bg-white border-r border-gray-200 flex flex-col items-center py-6 z-20 shadow-sm shrink-0">
@@ -467,6 +502,7 @@ $totalProductos = count($productos);
         </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<<<<<<< HEAD
             <header class="px-6 py-4 flex flex-col gap-4 items-center bg-[#F9F7F1] shrink-0 border-b border-gray-100">
                 <div class="w-full max-w-6xl flex items-center justify-between">
                     <div class="flex flex-col">
@@ -512,6 +548,49 @@ $totalProductos = count($productos);
                     <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
                         <?php foreach ($productos as $id => $prod): ?>
                             <?php
+=======
+        <header class="px-6 py-4 flex flex-col gap-4 items-center bg-[#F9F7F1] shrink-0 border-b border-gray-100">
+            <div class="w-full max-w-6xl flex items-center justify-between">
+                <div class="flex flex-col">
+                    <h1 class="text-xl font-head font-extrabold text-[#2C2C2C]">Productos</h1>
+                    <p class="text-gray-500 text-sm font-semibold">
+                        <?= $totalProductos ?> producto<?= $totalProductos === 1 ? '' : 's' ?> registrados
+                    </p>
+                </div>
+            </div>
+
+            <div class="relative w-full max-w-6xl flex items-center justify-between">
+                <input id="buscador" type="text" placeholder="Buscar producto..."
+                       class="w-full pl-12 pr-4 py-3 bg-white border-none rounded-full shadow-sm text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto px-6 pb-8 custom-scrollbar">
+            <section class="pt-5">
+                <div class="flex gap-3 mb-5 overflow-x-auto pb-2 scrollbar-hide">
+                    <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-[#2C2C2C] text-white shadow-lg"
+                            data-cat="todo">
+                        <i class="fa-solid fa-layer-group mr-2"></i>Todo
+                    </button>
+                    <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-white text-[#2C2C2C] shadow-sm border border-gray-100 cursor-pointer"
+                            data-cat="pizza">
+                        <i class="fa-solid fa-pizza-slice mr-2"></i>Pizzas
+                    </button>
+                    <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-white text-[#2C2C2C] shadow-sm border border-gray-100 cursor-pointer"
+                            data-cat="extra">
+                        <i class="fa-solid fa-bowl-food mr-2"></i>Extras
+                    </button>
+                    <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-white text-[#2C2C2C] shadow-sm border border-gray-100 cursor-pointer"
+                            data-cat="bebida">
+                        <i class="fa-solid fa-wine-glass mr-2"></i>Bebidas
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <?php foreach ($productos as $id => $prod): ?>
+                        <?php
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
                             $noDisp = ($prod['estado'] === 'nodis');
                             $precioTexto = [];
                             foreach ($prod['precios'] as $p) {
@@ -519,6 +598,7 @@ $totalProductos = count($productos);
                             }
                             $precioStr = implode(' / ', $precioTexto);
                             $imgPath = $prod['imagen'];
+<<<<<<< HEAD
                             ?>
                             <div class="producto-item card-modern <?= $noDisp ? 'bg-gray-50 opacity-60 grayscale' : 'bg-white hover:shadow-soft hover:-translate-y-1 cursor-pointer' ?> p-4 relative group transition-all duration-300 rounded-3xl border border-gray-100"
                                 data-id="<?= (int)$id ?>"
@@ -1077,3 +1157,534 @@ $totalProductos = count($productos);
 </body>
 
 </html>
+=======
+                        ?>
+                        <div class="producto-item card-modern <?= $noDisp ? 'bg-gray-50 opacity-60 grayscale' : 'bg-white hover:shadow-soft hover:-translate-y-1 cursor-pointer' ?> p-4 relative group transition-all duration-300 rounded-3xl border border-gray-100"
+                             data-id="<?= (int)$id ?>"
+                             data-cat="<?= htmlspecialchars($prod['categoria']) ?>"
+                             data-name="<?= strtolower(htmlspecialchars($prod['nombre'])) ?>">
+
+                            <?php if ($noDisp): ?>
+                                <div class="absolute inset-0 flex items-center justify-center z-10">
+                                    <span class="bg-gray-800 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                        NO DISPONIBLE
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="w-full h-40 rounded-2xl bg-gray-100 mb-3 overflow-hidden">
+                                <img src="<?= htmlspecialchars($imgPath) ?>"
+                                     onerror="this.src='img/default.webp'"
+                                     class="w-full h-full object-cover">
+                            </div>
+
+                            <div class="flex items-start justify-between gap-3 mb-1">
+                                <h3 class="font-head font-bold text-[#2C2C2C] text-lg leading-tight">
+                                    <?= htmlspecialchars($prod['nombre']) ?>
+                                </h3>
+                                <span class="text-[11px] font-bold px-2 py-1 rounded-full <?= $noDisp ? 'bg-gray-200 text-gray-500' : 'bg-[#A83232]/10 text-[#A83232]' ?>">
+                                    <?= htmlspecialchars($prod['categoria']) ?>
+                                </span>
+                            </div>
+
+                            <p class="text-xs text-gray-400 mb-3 truncate">
+                                <?= htmlspecialchars($prod['descripcion'] ?? '') ?>
+                            </p>
+
+                            <div class="space-y-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-head font-extrabold text-lg <?= $noDisp ? 'text-gray-400' : 'text-[#A83232]' ?>">
+                                        <?= htmlspecialchars($precioStr) ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+        </div>
+
+        <button id="btnNuevoProducto"
+                class="absolute bottom-5 right-5 w-14 h-14 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-xl z-40">
+            <i class="fa-solid fa-plus text-2xl"></i>
+        </button>
+
+        <div id="menuProducto"
+             class="hidden fixed bg-white shadow-xl rounded-2xl p-3 pb-0 gap-2 z-50">
+            <button id="btnEditarProducto"
+                class="mb-3 px-4 py-2 rounded-xl border border-[#A83232] text-[#A83232] bg-white font-bold w-full">
+                Editar
+            </button>
+            <button id="btnEliminarProducto"
+                class="mb-3 px-4 py-2 rounded-xl bg-[#A83232] text-white font-bold w-full">
+                Eliminar
+            </button>
+        </div>
+
+        <div id="modalProducto"
+             class="hidden absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 overflow-y-auto">
+            <div class="flex w-full max-w-2xl rounded-3xl bg-white flex-col m-6 p-5 pt-5 gap-4 relative max-h-[92vh] overflow-y-auto">
+                <div class="flex justify-between items-center gap-3">
+                    <div class="min-w-0">
+                        <h3 id="modalTitulo" class="font-head font-bold text-[#2C2C2C] text-xl leading-tight mb-1">Nuevo producto</h3>
+                        <p id="modalSubtitulo" class="text-sm text-gray-500">Completa los datos del producto</p>
+                    </div>
+                    <button id="btnCerrarModalProducto"
+                            class="w-10 h-10 text-2xl rounded-full bg-white shadow-sm flex items-center justify-center text-[#A83232] hover:bg-[#A83232] hover:text-white transition-colors shrink-0">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block font-head font-bold text-[#A83232] mb-2">Nombre</label>
+                            <input id="inputNombre" type="text" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#A83232] outline-none" placeholder="Nombre del producto">
+                        </div>
+
+                        <div>
+                            <label class="block font-head font-bold text-[#A83232] mb-2">Imagen .webp</label>
+                            <input id="inputImagen" type="file" accept="image/webp,.webp" class="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-white focus:ring-2 focus:ring-[#A83232] outline-none">
+                            <p class="text-xs text-gray-400 mt-2">Se guardará usando el nombre del producto con espacios reemplazados por “_”.</p>
+                            <div class="mt-3 rounded-2xl bg-gray-100 overflow-hidden border border-gray-200">
+                                <img id="previewImagen" src="img/default.webp" class="w-full h-48 object-cover">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-head font-bold text-[#A83232] mb-2">Descripción</label>
+                            <textarea id="inputDescripcion" rows="3" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#A83232] outline-none" placeholder="Descripción"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-head font-bold text-[#A83232] mb-2">Categoría</label>
+                                <select id="selectCategoria" class="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-[#A83232] outline-none bg-white">
+                                    <option value="extra">Extra</option>
+                                    <option value="pizza">Pizza</option>
+                                    <option value="bebida">Bebida</option>
+                                </select>
+                            </div>
+                            <div class="flex items-end">
+                                <label class="inline-flex items-center gap-3 cursor-pointer select-none w-full h-[48px] px-4 rounded-2xl border border-gray-200">
+                                    <input id="checkboxDisponible" type="checkbox" class="w-5 h-5 accent-[#A83232]" checked>
+                                    <span class="font-semibold text-gray-700">Disponible</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between gap-3">
+                            <label class="block font-head font-bold text-[#A83232]">Tamaños</label>
+                            <button id="btnAgregarTamano" type="button" class="px-4 py-2 rounded-full border border-[#A83232] text-[#A83232] font-bold hover:bg-[#A83232]/10 transition-colors">
+                                Agregar tamaño
+                            </button>
+                        </div>
+
+                        <div id="listaTamanos" class="space-y-3"></div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end">
+                    <button id="btnGuardarProducto"
+                            class="text-lg px-5 py-3 gap-2 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-md transition-colors">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span class="font-head font-bold text-base">GUARDAR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <script>
+    const PRODUCTOS = <?= json_encode($productos, JSON_UNESCAPED_UNICODE) ?>;
+    const botonesCategoria = document.querySelectorAll('.cat-btn');
+    const cards = document.querySelectorAll('.producto-item');
+    const buscador = document.getElementById('buscador');
+    const menu = document.getElementById('menuProducto');
+    const modal = document.getElementById('modalProducto');
+    const btnNuevoProducto = document.getElementById('btnNuevoProducto');
+    const btnCerrarModalProducto = document.getElementById('btnCerrarModalProducto');
+    const btnEditarProducto = document.getElementById('btnEditarProducto');
+    const btnEliminarProducto = document.getElementById('btnEliminarProducto');
+    const btnGuardarProducto = document.getElementById('btnGuardarProducto');
+    const btnAgregarTamano = document.getElementById('btnAgregarTamano');
+    const selectCategoria = document.getElementById('selectCategoria');
+    const checkboxDisponible = document.getElementById('checkboxDisponible');
+    const inputNombre = document.getElementById('inputNombre');
+    const inputImagen = document.getElementById('inputImagen');
+    const inputDescripcion = document.getElementById('inputDescripcion');
+    const listaTamanos = document.getElementById('listaTamanos');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalSubtitulo = document.getElementById('modalSubtitulo');
+
+    let productoSeleccionado = null;
+    let modoEdicion = false;
+    let categoriaActiva = 'todo';
+    let holdTimer = null;
+
+    function on(id, event, callback) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener(event, callback);
+    }
+
+    function getImagenProducto(nombre) {
+        return 'img/' + nombre.replaceAll(' ', '_') + '.webp';
+    }
+
+    function aplicarFiltros() {
+        const texto = buscador.value.toLowerCase().trim();
+
+        cards.forEach(card => {
+            const cat = card.dataset.cat;
+            const nombre = card.dataset.name;
+            const matchTexto = nombre.includes(texto);
+            const matchCat = categoriaActiva === 'todo' || cat === categoriaActiva;
+            card.style.display = (matchTexto && matchCat) ? 'block' : 'none';
+        });
+    }
+
+    botonesCategoria.forEach(btn => {
+        btn.addEventListener('click', () => {
+            categoriaActiva = btn.dataset.cat;
+
+            botonesCategoria.forEach(b => {
+                b.classList.remove('bg-[#2C2C2C]', 'text-white', 'shadow-lg');
+                b.classList.add('bg-white', 'text-[#2C2C2C]', 'shadow-sm', 'border', 'border-gray-100', 'cursor-pointer');
+            });
+
+            btn.classList.remove('bg-white', 'text-[#2C2C2C]', 'shadow-sm', 'border', 'border-gray-100', 'cursor-pointer');
+            btn.classList.add('bg-[#2C2C2C]', 'text-white', 'shadow-lg');
+            aplicarFiltros();
+        });
+    });
+
+    buscador.addEventListener('input', aplicarFiltros);
+
+    function crearFilaTamano(data = {}) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tamano-row grid grid-cols-[1fr_110px_auto] gap-2 items-center rounded-2xl border border-gray-200 p-3';
+        wrapper.dataset.tamanoId = data.id ?? '';
+
+        const nombreInput = document.createElement('input');
+        nombreInput.type = 'text';
+        nombreInput.className = 'tamano-nombre w-full px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#A83232] outline-none';
+        nombreInput.placeholder = 'Nombre del tamaño';
+        nombreInput.value = data.nombre ?? '';
+
+        const precioInput = document.createElement('input');
+        precioInput.type = 'number';
+        precioInput.step = '0.01';
+        precioInput.min = '0';
+        precioInput.className = 'tamano-precio w-full px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-[#A83232] outline-none';
+        precioInput.placeholder = 'Precio';
+        precioInput.value = data.precio ?? '';
+
+        const eliminarBtn = document.createElement('button');
+        eliminarBtn.type = 'button';
+        eliminarBtn.className = 'tamano-eliminar w-10 h-10 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525]';
+        eliminarBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        eliminarBtn.addEventListener('click', () => {
+            if (listaTamanos.querySelectorAll('.tamano-row').length === 1) return;
+            wrapper.remove();
+            actualizarEstadoTamanos();
+        });
+
+        wrapper.appendChild(nombreInput);
+        wrapper.appendChild(precioInput);
+        wrapper.appendChild(eliminarBtn);
+        listaTamanos.appendChild(wrapper);
+        actualizarEstadoTamanos();
+        return wrapper;
+    }
+
+    function obtenerFilasTamanos() {
+        return Array.from(listaTamanos.querySelectorAll('.tamano-row'));
+    }
+
+    function actualizarEstadoTamanos() {
+        const filas = obtenerFilasTamanos();
+        const multiple = filas.length > 1;
+
+        filas.forEach((fila, index) => {
+            const nombreInput = fila.querySelector('.tamano-nombre');
+            const eliminarBtn = fila.querySelector('.tamano-eliminar');
+
+            if (multiple) {
+                nombreInput.readOnly = false;
+                nombreInput.classList.remove('bg-gray-100');
+                eliminarBtn.style.display = 'flex';
+            } else {
+                nombreInput.readOnly = true;
+                nombreInput.classList.add('bg-gray-100');
+                eliminarBtn.style.display = 'none';
+            }
+
+            if (index === 0) {
+                eliminarBtn.style.display = 'none';
+            }
+        });
+    }
+
+    function cargarTamanosDesdeProducto(prod) {
+        listaTamanos.innerHTML = '';
+
+        if (prod.precios && prod.precios.length > 0) {
+            prod.precios.forEach(p => {
+                crearFilaTamano({
+                    id: p.id,
+                    nombre: p.tamano ?? '',
+                    precio: p.precio ?? ''
+                });
+            });
+        } else {
+            if (prod.categoria === 'pizza') {
+                crearFilaTamano({ nombre: 'Media', precio: '' });
+                crearFilaTamano({ nombre: 'Grande', precio: '' });
+                crearFilaTamano({ nombre: 'Familiar', precio: '' });
+            } else {
+                crearFilaTamano({ nombre: '', precio: '' });
+            }
+        }
+
+        actualizarEstadoTamanos();
+    }
+
+    function aplicarPlantillaNueva(categoria = 'extra') {
+        listaTamanos.innerHTML = '';
+
+        if (categoria === 'pizza') {
+            crearFilaTamano({ nombre: 'Media', precio: '' });
+            crearFilaTamano({ nombre: 'Grande', precio: '' });
+            crearFilaTamano({ nombre: 'Familiar', precio: '' });
+        } else {
+            crearFilaTamano({ nombre: '', precio: '' });
+        }
+
+        actualizarEstadoTamanos();
+    }
+
+    function abrirModalNuevo() {
+        modoEdicion = false;
+        productoSeleccionado = null;
+        modalTitulo.textContent = 'Nuevo producto';
+        modalSubtitulo.textContent = 'Completa los datos del producto';
+        inputNombre.value = '';
+        inputImagen.value = '';
+        inputDescripcion.value = '';
+        selectCategoria.value = 'extra';
+        checkboxDisponible.checked = true;
+        const preview = document.getElementById('previewImagen');
+        if (preview) {
+            preview.src = 'img/default.webp';
+            preview.onerror = () => preview.src = 'img/default.webp';
+        }
+        aplicarPlantillaNueva('extra');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function abrirModalEdicion(id) {
+        const prod = PRODUCTOS[id];
+        if (!prod) return;
+
+        modoEdicion = true;
+        productoSeleccionado = id;
+        modalTitulo.textContent = 'Editar producto';
+        modalSubtitulo.textContent = 'Modifica los datos y tamaños del producto';
+        inputNombre.value = prod.nombre ?? '';
+        inputImagen.value = '';
+        inputDescripcion.value = prod.descripcion ?? '';
+        selectCategoria.value = prod.categoria ?? 'extra';
+        checkboxDisponible.checked = (prod.estado === 'disponible');
+        cargarTamanosDesdeProducto(prod);
+
+        const preview = document.getElementById('previewImagen');
+        if (preview) {
+            preview.src = getImagenProducto(prod.nombre);
+            preview.onerror = () => preview.src = 'img/default.webp';
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function cerrarModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        productoSeleccionado = null;
+        modoEdicion = false;
+
+        const preview = document.getElementById('previewImagen');
+        if (preview) {
+            preview.src = 'img/default.webp';
+            preview.onerror = () => preview.src = 'img/default.webp';
+        }
+
+        inputImagen.value = '';
+    }
+
+    function abrirMenu(item, x, y) {
+        if (!menu) return;
+        menu.classList.add('hidden');
+        productoSeleccionado = item.dataset.id;
+        menu.style.top = y + 'px';
+        menu.style.left = x + 'px';
+        menu.classList.remove('hidden');
+    }
+
+    cards.forEach(item => {
+        item.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            abrirMenu(item, e.pageX, e.pageY);
+        });
+
+        item.addEventListener('touchstart', e => {
+            holdTimer = setTimeout(() => {
+                const touch = e.touches[0];
+                abrirMenu(item, touch.pageX, touch.pageY);
+            }, 600);
+        });
+
+        item.addEventListener('touchend', () => {
+            clearTimeout(holdTimer);
+        });
+    });
+
+    document.addEventListener('click', e => {
+        if (menu && !menu.contains(e.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+
+    on('btnNuevoProducto', 'click', abrirModalNuevo);
+    on('btnCerrarModalProducto', 'click', cerrarModal);
+
+    on('btnEditarProducto', 'click', () => {
+        if (!productoSeleccionado) return;
+        if (menu) menu.classList.add('hidden');
+        abrirModalEdicion(productoSeleccionado);
+    });
+
+    on('btnEliminarProducto', 'click', async () => {
+        if (!productoSeleccionado) return;
+        if (!confirm('¿Eliminar este producto?')) return;
+
+        const formData = new FormData();
+        formData.append('accion', 'eliminar_producto');
+        formData.append('producto_id', productoSeleccionado);
+
+        const res = await fetch('productos.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await res.json().catch(() => null);
+        if (result && result.success) {
+            location.reload();
+        } else {
+            alert(result?.error || 'No se pudo eliminar');
+        }
+    });
+
+    on('btnAgregarTamano', 'click', () => {
+        crearFilaTamano({ nombre: '', precio: '' });
+        const filas = obtenerFilasTamanos();
+        if (filas.length > 1) {
+            filas.forEach((fila) => {
+                const nombreInput = fila.querySelector('.tamano-nombre');
+                nombreInput.readOnly = false;
+                nombreInput.classList.remove('bg-gray-100');
+            });
+        }
+    });
+
+    on('selectCategoria', 'change', () => {
+        if (!modoEdicion) {
+            if (selectCategoria.value === 'pizza') {
+                if (obtenerFilasTamanos().length <= 1) {
+                    aplicarPlantillaNueva('pizza');
+                }
+            } else {
+                if (obtenerFilasTamanos().length === 0) {
+                    aplicarPlantillaNueva('extra');
+                }
+            }
+        }
+    });
+
+    on('inputImagen', 'change', () => {
+        const file = inputImagen.files && inputImagen.files[0] ? inputImagen.files[0] : null;
+        if (!file) return;
+        const preview = document.getElementById('previewImagen');
+        if (preview) {
+            preview.src = URL.createObjectURL(file);
+        }
+    });
+
+    on('btnGuardarProducto', 'click', async () => {
+        const nombre = inputNombre.value.trim();
+        const descripcion = inputDescripcion.value.trim();
+        const categoria = selectCategoria.value;
+        const disponible = checkboxDisponible.checked ? '1' : '0';
+        const filas = obtenerFilasTamanos();
+
+        if (!nombre) {
+            alert('Ingresa el nombre del producto');
+            return;
+        }
+
+        if (filas.length === 0) {
+            alert('Debes agregar al menos un tamaño');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('accion', 'guardar_producto');
+        formData.append('producto_id', modoEdicion && productoSeleccionado ? productoSeleccionado : '0');
+        formData.append('nombre', nombre);
+        formData.append('descripcion', descripcion);
+        formData.append('categoria', categoria);
+        formData.append('disponible', disponible);
+
+        const guardarNombreTamano = filas.length > 1;
+
+        filas.forEach(fila => {
+            formData.append('tamano_id[]', fila.dataset.tamanoId || '');
+            formData.append('tamano_nombre[]', guardarNombreTamano ? fila.querySelector('.tamano-nombre').value.trim() : '');
+            formData.append('tamano_precio[]', fila.querySelector('.tamano-precio').value.trim());
+        });
+
+        if (inputImagen.files && inputImagen.files[0]) {
+            formData.append('imagen', inputImagen.files[0]);
+        }
+
+        const res = await fetch('productos.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await res.json().catch(() => null);
+        if (result && result.success) {
+            location.reload();
+        } else {
+            alert(result?.error || 'No se pudo guardar');
+        }
+    });
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                cerrarModal();
+            }
+        });
+    }
+
+    aplicarFiltros();
+    aplicarPlantillaNueva('extra');
+    </script>
+</body>
+</html>
+>>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
