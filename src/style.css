@@ -1,0 +1,47 @@
+:root {
+--color-primary: #A83232;
+--color-primary-dark: #8a2525;
+--color-secondary: #556B2F;
+--color-accent: #D4A017;
+--color-bg: #F9F7F1;
+--color-surface: #FFFFFF;
+--color-text-main: #2C2C2C;
+--color-text-muted: #6b7280;
+--font-head: 'Montserrat', sans-serif;
+--font-body: 'Nunito', sans-serif;
+}
+
+body {
+background-color: var(--color-bg);
+color: var(--color-text-main);
+font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, .font-head {
+font-family: var(--font-head);
+}
+
+::-webkit-scrollbar {
+width: 6px;
+height: 6px;
+}
+::-webkit-scrollbar-track {
+background: transparent;
+}
+::-webkit-scrollbar-thumb {
+background: #e5e7eb;
+border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+background: #d1d5db;
+}
+
+.btn-pill {
+border-radius: 9999px;
+}
+.card-modern {
+border-radius: 24px;
+}
+.shadow-soft {
+box-shadow: 0 10px 25px -5px rgba(168, 50, 50, 0.08);
+}
