@@ -171,13 +171,10 @@ while ($row = $result->fetch_assoc()) {
                         <i class="fa-solid fa-pizza-slice mr-2"></i>Pizzas
                     </button>
                     <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-white text-[#2C2C2C] shadow-sm border border-gray-100 cursor-pointer"
-<<<<<<< HEAD
                             data-cat="pasta">
                         <i class="fa-solid fa-utensils mr-2"></i>Pastas
                     </button>
                     <button class="btn-pill cat-btn px-4 py-2.5 font-head font-bold transition-all shrink-0 bg-white text-[#2C2C2C] shadow-sm border border-gray-100 cursor-pointer"
-=======
->>>>>>> 744fd0bfdb0c52bfa7b34f4dd5c9cf64ffd1e08f
                             data-cat="extra">
                         <i class="fa-solid fa-bowl-food mr-2"></i>Extras
                     </button>
