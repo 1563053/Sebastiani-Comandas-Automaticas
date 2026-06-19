@@ -11,7 +11,12 @@ if (!isset($_SESSION["usuario"])) {
 
 require_once("conexion.php");
 
+function textoMesa(int $id): string {
+    return $id === 0 ? "Delivery" : "Mesa " . str_pad((string)$id, 2, "0", STR_PAD_LEFT);
+}
+
 $origen = strtolower($_GET['origen'] ?? ($_POST['origen'] ?? ''));
+$idPresente = isset($_GET['id']) || isset($_POST['id']);
 $idRecibido = isset($_GET['id']) ? (int)$_GET['id'] : (isset($_POST['id']) ? (int)$_POST['id'] : 0);
 
 if ($origen !== 'mesa' && $origen !== 'caja') {
@@ -19,7 +24,7 @@ if ($origen !== 'mesa' && $origen !== 'caja') {
     exit;
 }
 
-if ($idRecibido <= 0) {
+if (!$idPresente || ($origen === 'caja' && $idRecibido <= 0) || ($origen === 'mesa' && $idRecibido < 0)) {
     header("Location: " . ($origen === 'caja' ? "caja.php" : "mesas.php"));
     exit;
 }
@@ -76,7 +81,7 @@ if ($origen === 'caja') {
     $estadoOrden = $resOrden['estado'];
 }
 
-if ($orden_id <= 0 || $mesa_id <= 0) {
+if ($orden_id <= 0 || $mesa_id < 0) {
     header("Location: " . ($origen === 'caja' ? "caja.php" : "mesas.php"));
     exit;
 }
@@ -143,7 +148,7 @@ while ($row = $result->fetch_assoc()) {
                 <div class="flex flex-col">
                     <h1 class="text-xl font-head font-extrabold text-[#2C2C2C]">Carta</h1>
                     <p class="text-gray-500 text-sm font-semibold">
-                        Mesa <?php echo str_pad($mesa_id, 2, "0", STR_PAD_LEFT); ?> - Orden #<?php echo str_pad($orden_id, 4, "0", STR_PAD_LEFT); ?>
+                        <?php echo htmlspecialchars(textoMesa((int)$mesa_id)); ?> - Orden #<?php echo str_pad($orden_id, 4, "0", STR_PAD_LEFT); ?>
                     </p>
                 </div>
                 <a href="<?php echo htmlspecialchars($urlRetorno); ?>"
@@ -247,7 +252,7 @@ while ($row = $result->fetch_assoc()) {
 
         <div id="modalProducto"
              class="hidden absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-            <div class="flex w-full max-w-md rounded-3xl bg-white flex-col m-8 p-5 pt-5 gap-4 relative">
+            <div class="flex w-full max-w-md rounded-3xl bg-white flex-col m-4 p-5 pt-5 gap-4 relative">
                 <div class="flex justify-between items-center">
                     <div class="min-w-0">
                         <h3 id="modalNombre" class="font-head font-bold text-[#2C2C2C] text-xl leading-tight mb-1">Americana</h3>
@@ -291,16 +296,22 @@ while ($row = $result->fetch_assoc()) {
                           placeholder="Detalle del pedido"></textarea>
 
                 <div class="flex justify-between items-center">
-                    <div class="flex gap-2 items-center">
-                        <span class="font-head font-extrabold text-[#A83232] text-lg">S/.</span>
-                        <input id="precioManual" type="text" class="w-21 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                    <div class="flex gap-3 items-center">
+                        <div class="flex gap-2 items-center">
+                            <span class="font-head font-extrabold text-[#A83232] text-base">Cant:</span>
+                            <input id="cantidadPedido" type="number" min="1" step="1" value="1" class="w-16 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="font-head font-extrabold text-[#A83232] text-lg">S/.</span>
+                            <input id="precioManual" type="text" class="w-21 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                        </div>
                     </div>
-                    <button id="btnGuardarPedido"
-                            class="text-lg px-3 py-2 gap-2 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-md transition-colors">
-                        <i class="fa-solid fa-plus"></i>
-                        <span class="font-head font-bold text-base">AGREGAR</span>
-                    </button>
                 </div>
+                <button id="btnGuardarPedido"
+                        class="text-lg px-3 py-2 gap-3 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-md transition-colors">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="font-head font-bold text-base">AGREGAR</span>
+                </button>
             </div>
         </div> 
     </main>
@@ -325,6 +336,7 @@ while ($row = $result->fetch_assoc()) {
     const selectTamano = document.getElementById("selectTamano");
     const detallePedido = document.getElementById("detallePedido");
     const precioManual = document.getElementById("precioManual");
+    const cantidadPedido = document.getElementById("cantidadPedido");
 
     let productoActual = null;
     let categoriaActiva = "todo";
@@ -419,22 +431,26 @@ while ($row = $result->fetch_assoc()) {
     function actualizarPrecioManual() {
         if (!productoActual) return;
 
+        const cantidad = Math.max(1, parseInt(cantidadPedido.value || "1", 10));
+        let precioUnitario;
+
         if (productoActual.precios.length === 1) {
-            precioManual.value = productoActual.precios[0].precio;
+            precioUnitario = parseFloat(productoActual.precios[0].precio);
+            precioManual.value = (precioUnitario * cantidad).toFixed(2);
             return;
         }
 
         const precioTamano =
-            productoActual.precios[selectTamano.selectedIndex]?.precio
-            ?? productoActual.precios[0].precio;
+            parseFloat(productoActual.precios[selectTamano.selectedIndex]?.precio
+            ?? productoActual.precios[0].precio);
 
         if (productoActual.categoria !== "pizza") {
-            precioManual.value = precioTamano;
+            precioManual.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
         if (selectParte.value === "Entera") {
-            precioManual.value = precioTamano;
+            precioManual.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
@@ -442,15 +458,15 @@ while ($row = $result->fetch_assoc()) {
         const saborProd = PRODUCTOS[saborId];
 
         if (!saborProd) {
-            precioManual.value = precioTamano;
+            precioManual.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
         const precioSabor =
-            saborProd.precios[selectTamano.selectedIndex]?.precio
-            ?? saborProd.precios[0].precio;
+            parseFloat(saborProd.precios[selectTamano.selectedIndex]?.precio
+            ?? saborProd.precios[0].precio);
 
-        precioManual.value = Math.max(precioTamano, precioSabor);
+        precioManual.value = (Math.max(precioTamano, precioSabor) * cantidad).toFixed(2);
     }
 
     function abrirModal() {
@@ -465,6 +481,7 @@ while ($row = $result->fetch_assoc()) {
 
         detallePedido.value = "";
         precioManual.value = "";
+        cantidadPedido.value = "1";
         selectParte.value = "Entera";
         selectSabor.innerHTML = "";
         selectTamano.innerHTML = "";
@@ -548,6 +565,7 @@ while ($row = $result->fetch_assoc()) {
 
         const detalle = detallePedido.value.trim();
         const precio = parseFloat(precioManual.value || "0");
+        const cantidad = Math.max(1, parseInt(cantidadPedido.value || "1", 10));
 
         const idPrecioSeleccionado =
             productoActual.precios.length > 1
@@ -572,6 +590,7 @@ while ($row = $result->fetch_assoc()) {
                 id_precio: idPrecioSeleccionado,
                 detalle: detalle,
                 precio: precio,
+                cantidad: cantidad,
                 mitad: esMitad,
                 id_segundo_producto: idSegundoProducto,
                 origen: origenActual,
@@ -587,6 +606,8 @@ while ($row = $result->fetch_assoc()) {
             alert("Error al guardar el pedido");
         }
     });
+
+    cantidadPedido.addEventListener("input", actualizarPrecioManual);
 
     window.addEventListener("load", () => {
         detallePedido.value = "";

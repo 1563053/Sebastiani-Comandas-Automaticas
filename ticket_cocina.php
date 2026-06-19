@@ -3,12 +3,14 @@ require_once("conexion.php");
 
 $id_orden = $_GET['id_orden'] ?? '';
 $mesa = $_GET['mesa'] ?? '';
+$textoMesa = ((int)$mesa === 0) ? "Delivery" : "MESA " . $mesa;
 
 $stmt = $conexion->prepare("
 SELECT 
     dped.id,
     dped.detalle,
     dped.precio,
+    dped.cantidad,
     dped.impreso,
 
     dpre.nombre AS tamano,
@@ -157,7 +159,7 @@ body{
         </div>
 
         <div class="header">
-            MESA <?= $mesa ?>
+            <?= htmlspecialchars($textoMesa) ?>
             <br>
             ORDEN <?= $id_orden ?>
         </div>
@@ -166,22 +168,25 @@ body{
 
         <?php foreach($pedidos as $p): ?>
             <?php if($p['categoria']=="pizza" && $p['segunda_mitad']): ?>
-                <div class="box">
-                    <b>Pizza <?= $p['tamano'] ?></b>
+                <div class="producto">
+                    <b><?= ((int)$p['cantidad'] > 1) ? 'x' . (int)$p['cantidad'] . ' ' : '' ?>Pizza <?= $p['tamano'] ?></b>
                     <br>
-                    1/2 <?= $p['producto'] ?> <br>
-                    1/2 <?= $p['segunda_mitad'] ?>
+                    <div class="detalle">
+                        1/2 <?= $p['producto'] ?> <br>
+                        1/2 <?= $p['segunda_mitad'] ?>
+                    </div>
                     <?php if($p['detalle']): ?>
                         <br>
                         <?= $p['detalle'] ?>
                     <?php endif; ?>
                 </div>
-                <?php else: ?>
-                    <div class="producto">
+                <div class="line"></div>
+            <?php else: ?>
+                <div class="producto">
                 <?php if($p['categoria']=="pizza"){
-                    echo "PIZZA {$p['producto']} {$p['tamano']}";
+                    echo (((int)$p['cantidad'] > 1) ? "x" . (int)$p['cantidad'] . " " : "") . "PIZZA {$p['producto']} {$p['tamano']}";
                 }else{
-                    echo "{$p['producto']} {$p['tamano']}";
+                    echo (((int)$p['cantidad'] > 1) ? "x" . (int)$p['cantidad'] . " " : "") . "{$p['producto']} {$p['tamano']}";
                 }
                 ?>
                 </div>

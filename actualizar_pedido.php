@@ -14,6 +14,7 @@ $id_pedido = isset($data["id_pedido"]) ? (int)$data["id_pedido"] : 0;
 $id_precio = isset($data["id_precio"]) ? (int)$data["id_precio"] : 0;
 $detalle = isset($data["detalle"]) ? trim($data["detalle"]) : '';
 $precio = isset($data["precio"]) ? (float)$data["precio"] : 0.0;
+$cantidad = isset($data["cantidad"]) ? max(1, (int)$data["cantidad"]) : 1;
 $mitad = !empty($data["mitad"]);
 $id_segundo = isset($data["id_segundo_producto"]) && $data["id_segundo_producto"] !== ''
     ? (int)$data["id_segundo_producto"]
@@ -46,10 +47,10 @@ try {
 
     $stmt = $conexion->prepare("
         UPDATE detalle_pedido
-        SET id_precio = ?, detalle = ?, precio = ?, impreso = ?
+        SET id_precio = ?, detalle = ?, precio = ?, cantidad = ?, impreso = ?
         WHERE id = ?
     ");
-    $stmt->bind_param("isdid", $id_precio, $detalle, $precio, $impreso, $id_pedido);
+    $stmt->bind_param("isdiii", $id_precio, $detalle, $precio, $cantidad, $impreso, $id_pedido);
     $stmt->execute();
 
     $stmtDelete = $conexion->prepare("

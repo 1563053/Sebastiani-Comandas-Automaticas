@@ -11,9 +11,9 @@ if (!isset($_SESSION["usuario"])) {
 $data = json_decode(file_get_contents("php://input"), true);
 
 $idOrden = isset($data['id_orden']) ? (int)$data['id_orden'] : 0;
-$nuevaMesa = isset($data['mesa']) ? (int)$data['mesa'] : 0;
+$nuevaMesa = isset($data['mesa']) ? (int)$data['mesa'] : -1;
 
-if ($idOrden <= 0 || $nuevaMesa <= 0) {
+if ($idOrden <= 0 || $nuevaMesa < 0) {
     echo json_encode(["success" => false]);
     exit;
 }

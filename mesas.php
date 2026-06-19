@@ -36,6 +36,10 @@ $stmt->bind_result(
     $total,
     $estado_orden
 );
+
+function textoMesa(int $id): string {
+    return $id === 0 ? "Delivery" : "Mesa " . $id;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -62,6 +66,7 @@ $stmt->bind_result(
         <div class="flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
             <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
                 <?php while ($stmt->fetch()): ?>
+                    <?php $textoMesa = textoMesa((int)$id); ?>
                     <?php if ($estado == 'ocupada' && $estado_orden != 'abierta') {
                             $update = $conexion->prepare("UPDATE mesa SET estado='libre' WHERE id=?");
                             $update->bind_param("i", $id);
@@ -73,7 +78,7 @@ $stmt->bind_result(
                         <a href="orden.php?origen=mesa&id=<?php echo intval($id); ?>" class="block">
                             <div class="bg-white p-4 rounded-[20px] shadow-sm border-2 border-dashed border-gray-200 hover:border-[#556B2F] cursor-pointer transition-all group">
                                 <div class="flex justify-between items-start mb-2">
-                                    <span class="font-head font-bold uppercase text-gray-400 group-hover:text-[#556B2F]">Mesa <?php echo intval($id); ?></span>
+                                    <span class="font-head font-bold uppercase text-gray-400 group-hover:text-[#556B2F]"><?php echo htmlspecialchars($textoMesa); ?></span>
                                     <i class="fa-regular fa-circle text-gray-300 group-hover:text-[#556B2F]"></i>
                                 </div>
                                 <div class="flex flex-col items-center justify-center py-2 text-gray-400">
@@ -88,7 +93,7 @@ $stmt->bind_result(
                             <div class="bg-white p-4 rounded-[20px] shadow-md border-2 hover:border-[#A83232] cursor-pointer relative overflow-hidden transition-all group">
                                 <div class="absolute -right-4 -top-4 w-12 h-12 bg-[#A83232]/10 rounded-full"></div>
                                 <div class="flex justify-between items-start mb-2 relative z-10">
-                                    <span class="font-head font-bold uppercase text-[#2C2C2C] text-lg">Mesa <?php echo intval($id); ?></span>
+                                    <span class="font-head font-bold uppercase text-[#2C2C2C] text-lg"><?php echo htmlspecialchars($textoMesa); ?></span>
                                     <span class="bg-[#A83232] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Ocupada</span>
                                 </div>
                                 <div class="text-sm font-bold text-[#A83232]">
@@ -103,7 +108,7 @@ $stmt->bind_result(
                     <?php if ($estado == 'nodis'): ?>
                         <div class="flex flex-col bg-gray-100 p-4 rounded-[20px] shadow-inner opacity-80 cursor-not-allowed">
                             <div class="flex justify-between items-start mb-2">
-                                <span class="font-head font-bold uppercase text-gray-500">Mesa <?php echo intval($numero); ?></span>
+                                <span class="font-head font-bold uppercase text-gray-500"><?php echo htmlspecialchars($textoMesa); ?></span>
                                 <i class="fa-solid fa-clock text-gray-400"></i>
                             </div>
                             <div class="flex flex-col items-center justify-center py-5 text-gray-400">

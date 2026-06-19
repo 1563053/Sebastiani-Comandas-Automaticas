@@ -69,6 +69,10 @@ function colorEstado($estado) {
             return ['#2C2C2C', 'bg-white border-gray-200', 'Sin estado'];
     }
 }
+
+function textoMesa(int $id): string {
+    return $id === 0 ? "Delivery" : "Mesa " . $id;
+}
 ?>
 
 <!DOCTYPE html>
@@ -146,7 +150,7 @@ function colorEstado($estado) {
                                     </span>
                                 </div>
                                 <div class="text-sm text-gray-500 mb-1">
-                                    <i class="fa-solid fa-users mr-1"></i>Mesa <?php echo htmlspecialchars($row['mesa']); ?>
+                                    <i class="fa-solid fa-users mr-1"></i><?php echo htmlspecialchars(textoMesa((int)$row['mesa'])); ?>
                                 </div>
                                 <div class="text-base font-bold" style="color: <?php echo $color; ?>">
                                     S/. <?php echo number_format((float)$row['total'], 2); ?>

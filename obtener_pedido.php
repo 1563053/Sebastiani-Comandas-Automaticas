@@ -20,6 +20,7 @@ $stmt = $conexion->prepare("
         dped.id,
         dped.detalle,
         dped.precio,
+        dped.cantidad,
         dped.id_precio,
         dped.impreso,
         dpre.nombre AS tamano,

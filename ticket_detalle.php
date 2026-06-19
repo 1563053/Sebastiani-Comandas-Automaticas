@@ -3,6 +3,7 @@ require_once("conexion.php");
 
 $id_orden = isset($_GET['id_orden']) ? (int)$_GET['id_orden'] : 0;
 $mesa = isset($_GET['mesa']) ? (int)$_GET['mesa'] : 0;
+$textoMesa = $mesa === 0 ? "Delivery" : "MESA " . $mesa;
 
 if ($id_orden <= 0) {
     die("Orden inválida");
@@ -27,6 +28,7 @@ $stmtDetalle = $conexion->prepare("
         dped.id,
         dped.detalle,
         dped.precio,
+        dped.cantidad,
         dped.impreso,
 
         dpre.nombre AS tamano,
@@ -222,16 +224,19 @@ $total = (float)($resOrden['total'] ?? 0);
         <div class="tituloPantalla">Detalle de Orden</div>
 
         <div class="header">
-            MESA <?= $mesa ?> - ORDEN <?= $id_orden ?>
+            <?= htmlspecialchars($textoMesa) ?> - ORDEN <?= $id_orden ?>
         </div>
 
         <div class="line"></div>
 
         <?php foreach ($pedidos as $p): ?>
             <?php if ($p['categoria'] === "pizza" && !empty($p['segunda_mitad'])): ?>
-                <div class="box">
+                <div>
                     <div class="filaPedido">
                         <div class="nombrePedido">
+                            <?php if ((int)$p['cantidad'] > 1): ?>
+                                x<?= (int)$p['cantidad'] ?>
+                            <?php endif; ?>
                             PIZZA <?= htmlspecialchars($p['tamano']) ?>
                         </div>
                         <div class="precioPedido">
@@ -250,9 +255,13 @@ $total = (float)($resOrden['total'] ?? 0);
                         <div class="subtexto"><?= htmlspecialchars($p['detalle']) ?></div>
                     <?php endif; ?>
                 </div>
+                <div class="line"></div>
             <?php else: ?>
                 <div class="filaPedido">
                     <div class="nombrePedido">
+                        <?php if ((int)$p['cantidad'] > 1): ?>
+                            x<?= (int)$p['cantidad'] ?>
+                        <?php endif; ?>
                         <?php
                         if ($p['categoria'] === "pizza") {
                             echo "PIZZA " . htmlspecialchars($p['producto']) . " " . htmlspecialchars($p['tamano']);

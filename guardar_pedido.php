@@ -15,6 +15,7 @@ $orden_id   = isset($data["orden_id"]) ? (int)$data["orden_id"] : 0;
 $id_precio  = isset($data["id_precio"]) ? (int)$data["id_precio"] : 0;
 $detalle    = isset($data["detalle"]) ? trim($data["detalle"]) : "";
 $precio     = isset($data["precio"]) ? (float)$data["precio"] : 0.0;
+$cantidad   = isset($data["cantidad"]) ? max(1, (int)$data["cantidad"]) : 1;
 $mitad      = !empty($data["mitad"]);
 $id_segundo = isset($data["id_segundo_producto"]) && $data["id_segundo_producto"] !== ''
     ? (int)$data["id_segundo_producto"]
@@ -30,10 +31,10 @@ $conexion->begin_transaction();
 try {
     $stmt = $conexion->prepare("
         INSERT INTO detalle_pedido 
-        (id_precio, id_orden, impreso, detalle, precio)
-        VALUES (?, ?, FALSE, ?, ?)
+        (id_precio, id_orden, impreso, detalle, precio, cantidad)
+        VALUES (?, ?, FALSE, ?, ?, ?)
     ");
-    $stmt->bind_param("iisd", $id_precio, $orden_id, $detalle, $precio);
+    $stmt->bind_param("iisdi", $id_precio, $orden_id, $detalle, $precio, $cantidad);
     $stmt->execute();
 
     $id_pedido = $conexion->insert_id;

@@ -17,6 +17,10 @@ function responderJson(array $data): void {
     exit;
 }
 
+function textoMesa(int $id): string {
+    return $id === 0 ? "Delivery" : "Mesa " . $id;
+}
+
 $rawInput = file_get_contents("php://input");
 $jsonInput = json_decode($rawInput, true);
 
@@ -83,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && is_array($jsonInput)) {
 }
 
 $origen = strtolower($_GET['origen'] ?? ($_POST['origen'] ?? ''));
+$idPresente = isset($_GET['id']) || isset($_POST['id']);
 $idRecibido = isset($_GET['id']) ? (int)$_GET['id'] : (isset($_POST['id']) ? (int)$_POST['id'] : 0);
 
 if ($origen !== 'caja' && $origen !== 'mesa') {
@@ -90,7 +95,7 @@ if ($origen !== 'caja' && $origen !== 'mesa') {
     exit;
 }
 
-if ($idRecibido <= 0) {
+if (!$idPresente || ($origen === 'caja' && $idRecibido <= 0) || ($origen === 'mesa' && $idRecibido < 0)) {
     header("Location: " . ($origen === 'caja' ? "caja.php" : "mesas.php"));
     exit;
 }
@@ -111,7 +116,7 @@ $productos = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_orden'])) {
 
-    if ($origen !== 'mesa' || $idRecibido <= 0) {
+    if ($origen !== 'mesa' || $idRecibido < 0) {
         header("Location: mesas.php");
         exit;
     }
@@ -213,6 +218,7 @@ if (!$modoSoloMesa && $ordenActual) {
             dped.id AS id_pedido,
             dped.detalle,
             dped.precio AS precio_pedido,
+            dped.cantidad,
             dped.id_precio,
             dped.impreso,
 
@@ -371,7 +377,7 @@ if (!$modoSoloMesa && $ordenActual) {
                 <div class="flex items-center gap-2">
                     <div class="w-2 h-2 rounded-full bg-[#556B2F] animate-pulse"></div>
                     <span class="font-head font-bold text-base text-[#2C2C2C]">
-                        Mesa <?php echo intval($mesa_id); ?>
+                        <?php echo htmlspecialchars(textoMesa((int)$mesa_id)); ?>
                     </span>
                 </div>
 
@@ -427,6 +433,11 @@ if (!$modoSoloMesa && $ordenActual) {
 
                         <div class="flex items-start gap-3">
                             <span class="flex-1 min-w-0 font-head font-bold text-gray-800 leading-snug break-words">
+                                <?php if ((int)$item['cantidad'] > 1): ?>
+                                    <span class="inline-flex items-center justify-center px-2 py-0.5 mr-2 rounded-full bg-[#A83232]/10 text-[#A83232] text-xs font-bold">
+                                        x<?php echo (int)$item['cantidad']; ?>
+                                    </span>
+                                <?php endif; ?>
                                 Pizza <?php echo $item['nombre_tamano']; ?>
                             </span>
                             <span class="shrink-0 whitespace-nowrap font-bold text-gray-800 pr-1">
@@ -473,6 +484,11 @@ if (!$modoSoloMesa && $ordenActual) {
 
                         <div class="flex justify-between">
                             <span class="flex-1 min-w-0 font-head font-bold text-gray-800 leading-snug break-words">
+                                <?php if ((int)$item['cantidad'] > 1): ?>
+                                    <span class="inline-flex items-center justify-center px-2 py-0.5 mr-2 rounded-full bg-[#A83232]/10 text-[#A83232] text-xs font-bold">
+                                        x<?php echo (int)$item['cantidad']; ?>
+                                    </span>
+                                <?php endif; ?>
                                 <?php
                                     if ($item['categoria'] === 'pizza') {
                                         echo "Pizza ";
@@ -657,7 +673,7 @@ if (!$modoSoloMesa && $ordenActual) {
                 <span class="font-head font-extrabold text-[#A83232] text-lg">Mover a:</span>
                 <select id="selectMesa" class="p-3 bg-white border-none rounded-full shadow-sm font-head text-[#A83232] text-base focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
                     <?php foreach($mesasLibres as $m): ?>
-                    <option value="<?= $m['id'] ?>">Mesa <?= $m['id'] ?></option>
+                    <option value="<?= $m['id'] ?>"><?= htmlspecialchars(textoMesa((int)$m['id'])) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -671,7 +687,7 @@ if (!$modoSoloMesa && $ordenActual) {
 
     <div id="modalProducto"
          class="hidden absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div class="flex w-full max-w-md rounded-3xl bg-white flex-col m-8 p-5 pt-5 gap-4 relative">
+        <div class="flex w-full max-w-md rounded-3xl bg-white flex-col m-4 p-5 pt-5 gap-4 relative">
             <div class="flex justify-between items-center">
                 <div class="min-w-0">
                     <h3 id="modalNombre" class="font-head font-bold text-[#2C2C2C] text-xl leading-tight mb-1">Americana</h3>
@@ -720,16 +736,22 @@ if (!$modoSoloMesa && $ordenActual) {
                 </label>
             </div>
             <div class="flex justify-between items-center">
-                <div class="flex gap-2 items-center">
-                    <span class="font-head font-extrabold text-[#A83232] text-lg">S/.</span>
-                    <input id="precioManual" type="text" class="w-21 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                <div class="flex gap-3 items-center">
+                    <div class="flex gap-2 items-center">
+                        <span class="font-head font-extrabold text-[#A83232] text-base">Cant:</span>
+                        <input id="cantidadPedido" type="number" min="1" step="1" value="1" class="w-16 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <span class="font-head font-extrabold text-[#A83232] text-lg">S/.</span>
+                        <input id="precioManual" type="text" class="w-21 px-3 py-2 font-head font-extrabold text-[#A83232] text-base bg-white border-none rounded-full shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#A83232] outline-none transition-all">
+                    </div>
                 </div>
-                <button id="btnGuardarPedido"
-                        class="text-lg px-3 py-2 gap-2 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-md transition-colors">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span class="font-head font-bold text-base">GUARDAR</span>
-                </button>
             </div>
+            <button id="btnGuardarPedido"
+                    class="text-lg px-3 py-2 gap-2 rounded-full bg-[#A83232] text-white flex items-center justify-center hover:bg-[#8a2525] shadow-md transition-colors">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span class="font-head font-bold text-base">GUARDAR</span>
+            </button>
         </div>
     </div>
     <?php endif; ?>
@@ -862,6 +884,7 @@ if (!$modoSoloMesa && $ordenActual) {
     const selectParte = document.getElementById("selectParte");
     const selectSabor = document.getElementById("selectSabor");
     const checkboxImpreso = document.getElementById("checkboxImpreso");
+    const cantidadPedido = document.getElementById("cantidadPedido");
 
     let holdTimer;
     let pedidoSeleccionado = null;
@@ -1086,6 +1109,7 @@ if (!$modoSoloMesa && $ordenActual) {
         }
 
         document.getElementById("detallePedido").value = data.detalle ?? "";
+        cantidadPedido.value = Math.max(1, parseInt(data.cantidad || "1", 10));
         document.getElementById("precioManual").value = data.precio;
         if (checkboxImpreso) {
             checkboxImpreso.checked = Number(data.impreso) === 1;
@@ -1107,6 +1131,7 @@ if (!$modoSoloMesa && $ordenActual) {
 
         const detalle = document.getElementById("detallePedido").value;
         const precio  = parseFloat(document.getElementById("precioManual").value || "0");
+        const cantidad = Math.max(1, parseInt(cantidadPedido.value || "1", 10));
 
         const usaTamanos = this.dataset.usatamanos === "1";
         let idPrecio = parseInt(this.dataset.idprecio, 10);
@@ -1141,6 +1166,7 @@ if (!$modoSoloMesa && $ordenActual) {
                 id_precio: idPrecio,
                 detalle: detalle,
                 precio: precio,
+                cantidad: cantidad,
                 mitad: esMitad,
                 id_segundo_producto: idSegundoProducto,
                 impreso: impreso
@@ -1162,6 +1188,7 @@ if (!$modoSoloMesa && $ordenActual) {
 
         document.getElementById("detallePedido").value = "";
         document.getElementById("precioManual").value = "";
+        cantidadPedido.value = "1";
         if (checkboxImpreso) checkboxImpreso.checked = false;
         selectParte.value = "Entera";
         selectSabor.innerHTML = "";
@@ -1173,20 +1200,21 @@ if (!$modoSoloMesa && $ordenActual) {
 
         const input = document.getElementById("precioManual");
         const tamanoIndex = selectTamano.selectedIndex;
+        const cantidad = Math.max(1, parseInt(cantidadPedido.value || "1", 10));
 
         const precioTamano =
-            productoActual.precios[tamanoIndex]?.precio
-            ?? productoActual.precios[0].precio;
+            parseFloat(productoActual.precios[tamanoIndex]?.precio
+            ?? productoActual.precios[0].precio);
 
         if (productoActual.categoria !== "pizza") {
             if (btnGuardar.dataset.precioManual === "1") return;
-            input.value = precioTamano;
+            input.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
         if (selectParte.value === "Entera") {
             if (btnGuardar.dataset.precioManual === "1") return;
-            input.value = precioTamano;
+            input.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
@@ -1195,15 +1223,15 @@ if (!$modoSoloMesa && $ordenActual) {
 
         if (!saborProd) {
             if (btnGuardar.dataset.precioManual === "1") return;
-            input.value = precioTamano;
+            input.value = (precioTamano * cantidad).toFixed(2);
             return;
         }
 
         const precioSabor =
-            saborProd.precios[tamanoIndex]?.precio
-            ?? saborProd.precios[0].precio;
+            parseFloat(saborProd.precios[tamanoIndex]?.precio
+            ?? saborProd.precios[0].precio);
 
-        input.value = Math.max(precioTamano, precioSabor);
+        input.value = (Math.max(precioTamano, precioSabor) * cantidad).toFixed(2);
     }
 
     if (selectTamano) {
@@ -1239,6 +1267,13 @@ if (!$modoSoloMesa && $ordenActual) {
                 selectSabor.style.display = "none";
             }
 
+            actualizarPrecioManual();
+        });
+    }
+
+    if (cantidadPedido) {
+        cantidadPedido.addEventListener("input", () => {
+            btnGuardar.dataset.precioManual = "0";
             actualizarPrecioManual();
         });
     }
